@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
+  namespace: my-ngnix
   labels:
     app: nginx
 spec:
@@ -44,6 +45,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
+  namespace: my-ngnix
 spec:
   selector:
     app: nginx
@@ -58,6 +60,7 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: nginx
+  namespace: my-ngnix
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
