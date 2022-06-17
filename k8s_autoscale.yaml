@@ -1,0 +1,83 @@
+---
+### Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-app
+  labels:
+    app: grpc-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-app
+  template:
+    metadata:
+      name: grpc-app
+      labels:
+        app: grpc-app
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - grpc-app
+              topologyKey: "kubernetes.io/hostname"
+
+      containers:
+        - name: grpc-app
+          image: cr.cloudil.com/crl10hrumj719f2gdmvn/grpc-test-server
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "1"
+---
+### Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-service
+spec:
+  selector:
+    app: grpc-app
+  type: NodePort
+  ports:
+    - name: grpc
+      port: 80
+      targetPort: 8080 #!!
+      protocol: TCP
+      nodePort: 30085 #!!!!
+---
+### HPA
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: grpc-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: grpc-app
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: External
+      external:
+        metric:
+          name: "load_balancer.requests_count_per_second"
+          selector:
+            matchLabels:
+              service: "application-load-balancer"
+              load_balancer: "a7p6mc2jdkh4u8j112ug"
+              code: "total"
+              backend_group: "a7pcv8r4i6s888su8dmd"
+        target:
+          type: AverageValue
+          averageValue: "2"
