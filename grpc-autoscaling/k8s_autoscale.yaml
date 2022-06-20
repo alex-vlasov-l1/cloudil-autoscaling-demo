@@ -67,17 +67,4 @@ spec:
     name: grpc-app
   minReplicas: 1
   maxReplicas: 10
-  metrics:
-    - type: External
-      external:
-        metric:
-          name: "load_balancer.requests_count_per_second"
-          selector:
-            matchLabels:
-              service: "application-load-balancer"
-              load_balancer: "a7p6mc2jdkh4u8j112ug"
-              code: "total"
-              backend_group: "a7pcv8r4i6s888su8dmd"
-        target:
-          type: AverageValue
-          averageValue: "2"
+  targetCPUUtilizationPercentage: 20
