@@ -67,4 +67,4 @@ spec:
     name: grpc-app
   minReplicas: 1
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 20
+  targetCPUUtilizationPercentage: 5
